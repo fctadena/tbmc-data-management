@@ -1,30 +1,37 @@
 import os
+from dotenv import load_dotenv, dotenv_values
+
+
+# #docu1.py
+# #PURPOSE: To save csv generated data from docusign to aws database.
 
 
 
-#docu1.py
-#PURPOSE: To save csv generated data from docusign to aws database.
+# #CHECK IF FILE "Envelope Recipient Report.csv" EXIST
+# def file_checker():
+#     #File "Envelope Recipient Report.csv" extracted from Docusign
+#     print("Checking if 'Envelope Recipient Report.csv' exist")
+#     if os.path.exists("Envelope Recipient Report.csv"):
+#         print("'Envelope Recipient Report.csv' exist.")
+#         print("Proceeding to update database.")
+
+#         #add function here..
+
+
+#     else:
+#         print("'Envelope Recipient Report.csv' does not exist.")
 
 
 
-#CHECK IF FILE "Envelope Recipient Report.csv" EXIST
-def file_checker():
-    #File "Envelope Recipient Report.csv" extracted from Docusign
-    print("Checking if 'Envelope Recipient Report.csv' exist")
-    if os.path.exists("Envelope Recipient Report.csv"):
-        print("'Envelope Recipient Report.csv' exist.")
-        print("Proceeding to update database.")
+# file_checker()
 
-        #add function here..
+load_dotenv()
 
+print("Francis")
+username = os.getenv('USERNAME')
+combined = os.getenv('COMBINED')
 
-    else:
-        print("'Envelope Recipient Report.csv' does not exist.")
-
-
-
-file_checker()
-
+print(combined)
 
 
 
