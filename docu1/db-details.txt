@@ -1,0 +1,9 @@
+TBMC Server 1
+username: postgres
+port: 5432
+localhost
+password: strike
+
+db_name: tbmc_db
+username: tbmc_db_user
+password: 123456
