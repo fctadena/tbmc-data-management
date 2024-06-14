@@ -1,12 +1,81 @@
+# import os
+# import pandas as pd
+# import psycopg2
+# from sqlalchemy import create_engine, text, MetaData, Table
+
+# expected_columns = [
+#     '"Envelope ID"',
+#     'Subject',
+#     'Status',
+#     'Sender Name',
+#     'Recipient Name',
+#     'Routing Order',
+#     'Action',
+#     'Sent On (Date)',
+#     'Sent On (Time)',
+#     'Completed On (Date)',
+#     'Completed On (Time)',
+#     'Completion Time (DD:HH:MM)'
+# ]
+
+# db_params = {
+#     'host':'localhost',
+#     'database':'tbmc_db',
+#     'user': 'tbmc_db_user',
+#     'password': '123456',
+#     'table':'tbmc_db1'
+# }
+
+# print("Checking if 'Envelope Recipient Report.csv' exists")
+# if not os.path.exists("Envelope Recipient Report.csv"):
+#     print("File does not exist. Exiting..")
+# else:
+#     print("'Envelope Recipient Report.csv' exists. Proceeding to read file...")
+#     try:
+#         data = pd.read_csv("Envelope Recipient Report.csv")
+#         print("Successfully read file")
+#         actual_columns = [col.replace("\ufeff", "") for col in data.columns]
+#         if actual_columns == expected_columns:
+#             print("Columns are correct")
+            
+#             conn = psycopg2.connect(
+#                 host=db_params['host'],
+#                 database=db_params['database'],
+#                 user=db_params['user'],
+#                 password=db_params['password']
+#             )
+#             conn.set_session(autocommit=True)
+            
+#             engine = create_engine(f"postgresql://{db_params['user']}:{db_params['password']}@{db_params['host']}:5432/{db_params['database']}")
+            
+#             table_name = db_params['table']
+#             csv_file = "Envelope Recipient Report.csv"
+            
+#             meta = MetaData()
+#             meta.reflect(bind=engine)
+            
+#             if table_name in meta.tables:
+#                 # Drop the table
+#                 meta.tables[table_name].drop(engine, checkfirst=True)
+#                 print(f"Table '{table_name}' dropped successfully (including dependent objects).")
+#             else:
+#                 print(f"Table '{table_name}' does not exist. Proceeding to create a new table.")
+            
+#             # Upload data to database
+#             data.to_sql(table_name, engine, if_exists='replace', index=False)
+#             print(f"Data from '{csv_file}' uploaded successfully to table '{table_name}'.")
+            
+#             conn.close()
+#         else:
+#             print("Columns are not OK")
+#     except Exception as e:
+#         print(f"Error while reading file or connecting to database: {e}")
+
+
 import os
-from dotenv import load_dotenv
 import pandas as pd
 import psycopg2
-from sqlalchemy import create_engine, text
-
-
-load_dotenv()
-
+from sqlalchemy import create_engine, text, MetaData, Table
 
 expected_columns = [
     '"Envelope ID"',
@@ -23,115 +92,91 @@ expected_columns = [
     'Completion Time (DD:HH:MM)'
 ]
 
-# db_params = {
-#     'host': os.getenv('DB_HOST', 'localhost'),
-#     'database': os.getenv('DB_NAME', 'tbmc_db'),
-#     'user': os.getenv('DB_USER', 'tbmc_db_user'),
-#     'password': os.getenv('DB_PASSWORD', 123456),
-#     'table': os.getenv('DB_TABLE', 'tbmc_db1')
-# }
-
-
 db_params = {
-    'host':'localhost',
-    'database':'tbmc_db',
+    'host': 'localhost',
+    'database': 'tbmc_db',
     'user': 'tbmc_db_user',
-    'password': 123456,
-    'table':'tbmc_db1'
-    }
+    'password': '123456',
+    'table': 'tbmc_db1'
+}
 
-
-def connection_config():
+def check_file_and_columns(file_path):
+    print(f"Checking if '{file_path}' exists")
+    if not os.path.exists(file_path):
+        print("File does not exist. Exiting..")
+        return None
+    
+    print(f"'{file_path}' exists. Proceeding to read file...")
     try:
-        # Creating connection to the Postgres server
+        data = pd.read_csv(file_path)
+        print("Successfully read file")
+        actual_columns = [col.replace("\ufeff", "") for col in data.columns]
+        if actual_columns == expected_columns:
+            print("Columns are correct")
+            return data
+        else:
+            print("Columns are not OK")
+            return None
+    except Exception as e:
+        print(f"Error while reading file: {e}")
+        return None
+
+def connect_to_database(db_params):
+    try:
         conn = psycopg2.connect(
             host=db_params['host'],
             database=db_params['database'],
             user=db_params['user'],
             password=db_params['password']
         )
-        # Setting automatic commit to True
         conn.set_session(autocommit=True)
         
-        # Creating engine for SQLAlchemy
         engine = create_engine(f"postgresql://{db_params['user']}:{db_params['password']}@{db_params['host']}:5432/{db_params['database']}")
         
+        print("Database connection successful")
         return conn, engine
-    
     except Exception as e:
         print(f"Error connecting to database: {e}")
         return None, None
 
-
-def file_readiness_checker():
-    # Check if the file exists
-    print("Checking if 'Envelope Recipient Report.csv' exists")
-    if not os.path.exists("Envelope Recipient Report.csv"):
-        print("File does not exist. Exiting..")
-        return None
-
-    print("'Envelope Recipient Report.csv' exists. Proceeding to read file...")
+def upload_to_database(data, engine, table_name):
     try:
-        data = pd.read_csv("Envelope Recipient Report.csv")
-        print("Successfully read file")
+        # Drop table if exists
+        meta = MetaData()
+        meta.reflect(bind=engine)
+        
+        if table_name in meta.tables:
+            meta.tables[table_name].drop(engine, checkfirst=True)
+            print(f"Table '{table_name}' dropped successfully (including dependent objects).")
+        else:
+            print(f"Table '{table_name}' does not exist. Proceeding to create a new table.")
+        
+        # Upload data to database
+        data.to_sql(table_name, engine, if_exists='replace', index=False)
+        print(f"Data uploaded successfully to table '{table_name}'.")
     except Exception as e:
-        print(f"Error while reading file: {e}")
-        return None
+        print(f"Error uploading data to database: {e}")
 
-    # Check if columns match expected columns
-    actual_columns = [col.replace("\ufeff", "") for col in data.columns]
-    if actual_columns == expected_columns:
-        print("Columns are OK")
-        return data
-    else:
-        print("Columns are not OK")
-        return None
-
-
-
-
-def data_upload(data, engine):
-    with engine.connect() as conn:
-        table_name = db_params['table']
-        csv_file = "Envelope Recipient Report.csv"
-
-        try:
-            # Check if the table exists
-            if conn.dialect.has_table(conn, table_name):
-                # Drop the table with CASCADE
-                conn.execute(text(f"DROP TABLE IF EXISTS {table_name} CASCADE"))
-                print(f"Table '{table_name}' dropped successfully (including dependent objects).")
-            else:
-                print(f"Table '{table_name}' does not exist. Proceeding to create a new table.")
-
-            # Create a new table and upload the data
-            data.to_sql(table_name, conn, if_exists='replace', index=False)
-            print(f"Data from '{csv_file}' uploaded successfully to table '{table_name}'.")
-
-        except Exception as e:
-            print(f"Error uploading data from '{csv_file}' to table '{table_name}': {e}")
-            
-
-
-# if __name__ == "__main__":
-#     data = file_readiness_checker()
-#     if data is not None:
-#         conn, engine = connection_config()
-#         if conn and engine:
-#             data_upload(data, engine)
-#             conn.close()
-            
-            
 if __name__ == "__main__":
-    try:
-        data = file_readiness_checker()
-        if data is not None:
-            conn, engine = connection_config()
-            if conn and engine:
-                data_upload(data, engine)
-                conn.close()
-    except Exception as e:
-        print(f"Unexpected error occurred: {e}")
+    file_path = "Envelope Recipient Report.csv"
+    
+    print(f"Checking file '{file_path}' and verifying columns...")
+    data = check_file_and_columns(file_path)
+    
+    if data is not None:
+        print("File check successful.")
+        print("Connecting to database...")
+        conn, engine = connect_to_database(db_params)
         
-        
-#### NOT WORKING!!!!
+        if conn and engine:
+            print("Database connection successful.")
+            table_name = db_params['table']
+            
+            print(f"Uploading data to table '{table_name}'...")
+            upload_to_database(data, engine, table_name)
+            
+            conn.close()
+            print("Database connection closed.")
+            
+    else:
+        print("File check failed or columns are incorrect. Exiting.")
