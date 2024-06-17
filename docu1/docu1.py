@@ -30,8 +30,19 @@ db_params = {
     'database': os.getenv('DB_NAME') or 'tbmc_db',
     'user': os.getenv('DB_USER') or 'tbmc_db_user',
     'password': os.getenv('DB_PASSWORD') or '123456',
-    'table': os.getenv('DB_TABLE') or 'tbmc_db1'
+    'table': os.getenv('DB_TABLE') or 'tbmc_db1',
+    'port': os.getenv('DB_PORT') or '5432'
 }
+
+# # === AWS RDS Database Configuration ===
+# db_params = {
+#     'host': os.getenv('AWS_DB_HOST'),
+#     'database': os.getenv('AWS_DB_NAME'),
+#     'user': os.getenv('AWS_DB_USER'),
+#     'password': os.getenv('AWS_DB_PASSWORD'),
+#     'table': os.getenv('AWS_DB_TABLE'),
+#     'port': os.getenv('AWS_DB_PORT')
+# }
 
 
 
@@ -66,9 +77,8 @@ def connect_to_database(db_params):
         )
         conn.set_session(autocommit=True)
         
-        engine = create_engine(f"postgresql://{db_params['user']}:{db_params['password']}@{db_params['host']}:5432/{db_params['database']}")
+        engine = create_engine(f"postgresql://{db_params['user']}:{db_params['password']}@{db_params['host']}:{db_params['port']}/{db_params['database']}")
         
-        print("Database connection successful")
         return conn, engine
     except Exception as e:
         print(f"Error connecting to database: {e}")
@@ -93,7 +103,10 @@ def upload_to_database(data, engine, table_name):
         print(f"Error uploading data to database: {e}")
 
 if __name__ == "__main__":
-    file_path = "Envelope Recipient Report.csv"
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(script_dir, "../data/docusign/Envelope Recipient Report.csv")
+    
+    # file_path = "data/Envelope Recipient Report.csv"
     
     print(f"Checking file '{file_path}' and verifying columns...")
     data = check_file_and_columns(file_path)
