@@ -1,0 +1,40 @@
+{
+    "tables": [
+      {
+        "table_name": "Project",
+        "columns": [
+          {"column_name": "project_id", "data_type": "SERIAL"},
+          {"column_name": "project_name", "data_type": "VARCHAR(255)"}
+        ]
+      },
+      {
+        "table_name": "Source",
+        "columns": [
+          {"column_name": "source_id", "data_type": "SERIAL"},
+          {"column_name": "source_name", "data_type": "VARCHAR(255)"}
+        ]
+      },
+      {
+        "table_name": "Type",
+        "columns": [
+          {"column_name": "type_id", "data_type": "SERIAL"},
+          {"column_name": "type_name", "data_type": "VARCHAR(255)"}
+        ]
+      },
+      {
+        "table_name": "Items",
+        "columns": [
+          {"column_name": "description", "data_type": "TEXT"},
+          {"column_name": "man_r", "data_type": "DECIMAL(10, 2)"},
+          {"column_name": "unit", "data_type": "VARCHAR(50)"},
+          {"column_name": "qty", "data_type": "INTEGER"},
+          {"column_name": "unit_cost", "data_type": "DECIMAL(10, 2)"},
+          {"column_name": "amount", "data_type": "DECIMAL(10, 2)"},
+          {"column_name": "project_id", "data_type": "INTEGER"},
+          {"column_name": "source_id", "data_type": "INTEGER"},
+          {"column_name": "type_id", "data_type": "INTEGER"}
+        ]
+      }
+    ]
+  }
+  

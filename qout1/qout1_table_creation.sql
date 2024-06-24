@@ -1,3 +1,4 @@
+
 -- Create the Project table
 CREATE TABLE Project (
     project_name VARCHAR(255) PRIMARY KEY
@@ -22,13 +23,15 @@ CREATE TABLE Items (
     unit_cost DECIMAL(10, 2),
     amount DECIMAL(10, 2),
     project VARCHAR(255) NOT NULL,
+	type VARCHAR(255) NOT NULL,
+	date DATE,
     source VARCHAR(255) NOT NULL,
-    type VARCHAR(255) NOT NULL,
     PRIMARY KEY (description, project, source),
     FOREIGN KEY (project) REFERENCES Project(project_name),
     FOREIGN KEY (source) REFERENCES Source(source_name),
     FOREIGN KEY (type) REFERENCES Type(type_name)
 );
+
 
 
 -- -- Create the Project table
