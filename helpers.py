@@ -1,4 +1,5 @@
 import os
+import pandas as pd
 
 def list_files_in_folder(folder_name):
     """
@@ -30,3 +31,38 @@ def list_files_in_folder(folder_name):
 folder_name = 'data\quotation_princing_analysis'  # Replace with your folder path
 files = list_files_in_folder(folder_name)
 print("Files in folder:", files)
+
+
+
+
+def planner_task(data):
+    pass
+
+def transformer_mimi(filename):
+    try:
+        data = pd.read_excel(filename)
+        return data
+    except Exception as e:
+        print("Error occurred while opening the Excel file:", str(e))
+
+# # Example usage
+# filename = "example.xlsx"
+# data = open_excel_file(filename)
+# print(data.head())
+
+
+
+def transform_dataframe(df):
+    new_records = []
+    for index, row in df.iterrows():
+        assigned_to = row['assigned_to'].split(';')
+        for name in assigned_to:
+            new_record = {'task': row['task'], 'assigned_to': name}
+            new_records.append(new_record)
+    new_df = pd.DataFrame(new_records)
+    return new_df
+
+# Example usage
+df = pd.DataFrame({'task': ['Task 1'], 'assigned_to': ['Assignee1;Assignee2']})
+transformed_df = transform_dataframe(df)
+print(transformed_df)
