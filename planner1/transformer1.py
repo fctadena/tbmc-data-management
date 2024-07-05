@@ -100,6 +100,9 @@ def main(file_path, output_path):
 
 
 file_path = 'Project Timeline Update.xlsx'
-output_path = 'Transformed_Project_Timeline_Update.xlsx'
+# output_path = 'Transformed_Project_Timeline_Update.xlsx'
+# output_path = r'C:\Users\PHTadenaFr\Documents\tbmc-data-management\data\project_timeline\Project Timeline Update.xlsx'
+output_path = r'data\project_timeline\Project Timeline Update.xlsx'
+
 
 data2 = main(file_path, output_path)
