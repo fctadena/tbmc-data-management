@@ -99,10 +99,13 @@ def main(file_path, output_path):
 
 
 
-file_path = 'Project Timeline Update.xlsx'
-# output_path = 'Transformed_Project_Timeline_Update.xlsx'
+# file_path = 'Project Timeline Update.xlsx'
+file_path = r"C:\Users\Francis\00_ML\00_Power BI\docu1\tbmc-data-management\data\project_timeline\Project Timeline Update.xlsx"
+
+output_path = 'Transformed_Project_Timeline_Update.xlsx'
 # output_path = r'C:\Users\PHTadenaFr\Documents\tbmc-data-management\data\project_timeline\Project Timeline Update.xlsx'
-output_path = r'data\project_timeline\Project Timeline Update.xlsx'
+# output_path = r'data\project_timeline\Project Timeline Update.xlsx'
 
 
-data2 = main(file_path, output_path)
+transformed_data = main(file_path, output_path)
+print(transformed_data)
