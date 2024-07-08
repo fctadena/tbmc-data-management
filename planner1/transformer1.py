@@ -1,6 +1,28 @@
 import pandas as pd
+from datetime import datetime
 
 
+#TRANSFORMING THE NAME ON THE "Assigned to" COLUMN
+def transform_assigned_to(record):
+    if isinstance(record, str):  # Check if record is a string
+        parts = record.split(',')
+        if len(parts) >= 2:
+            return ', '.join(parts[:2])  # Join surname and firstname with comma and space
+        else:
+            return record  # Return original record if format is unexpected
+    else:
+        return record  # Return original record if not a string (e.g., NaN)
+    
+
+def transform_late(due_date, is_late):
+    current_date = datetime.now()
+    due_date = pd.to_datetime(due_date)
+    days_difference = (current_date - due_date).days
+    
+    if is_late:
+        return f"{days_difference} days late"
+    else:
+        return f"On-track by {-days_difference} days" if days_difference < 0 else f"On-track by {days_difference} days"
 
 def transformer1(file_path):
     data = pd.read_excel(file_path)
@@ -80,6 +102,8 @@ def concatenate_data(data, new_data):
     return concatenated_data
 
 
+
+
 def delete_rows(concatenated_data, idxs):
     final_data = concatenated_data.drop(idxs)
     return final_data
@@ -92,7 +116,10 @@ def main(file_path, output_path):
     data = transformer1(file_path)
     idxs = getting_idxs(data)
     new_data = populate_new_data(data, idxs)
+    
     concatenated_data = concatenate_data(data, new_data)
+    concatenated_data['Assigned To'] = concatenated_data['Assigned To'].apply(lambda x: transform_assigned_to(x))
+    concatenated_data['Late'] = concatenated_data.apply(lambda row: transform_late(row['Due date'], row['Late']), axis=1)
     final_data = delete_rows(concatenated_data, idxs)
     final_data.to_excel(output_path, index=False)
     return final_data
@@ -100,8 +127,8 @@ def main(file_path, output_path):
 
 
 # file_path = 'Project Timeline Update.xlsx'
-# file_path = r"C:\Users\Francis\00_ML\00_Power BI\docu1\tbmc-data-management\data\project_timeline\Project Timeline Update.xlsx"
-file_path = r"C:\Users\PHTadenaFr\Documents\tbmc-data-management\data\project_timeline\Project Timeline Update.xlsx"
+file_path = r"C:\Users\Francis\00_ML\00_Power BI\docu1\tbmc-data-management\data\project_timeline\Project Timeline Update.xlsx"
+# file_path = r"C:\Users\PHTadenaFr\Documents\tbmc-data-management\data\project_timeline\Project Timeline Update.xlsx"
 
 output_path = 'Transformed_Project_Timeline_Update.xlsx'
 # output_path = r'C:\Users\PHTadenaFr\Documents\tbmc-data-management\data\project_timeline\Project Timeline Update.xlsx'
@@ -109,4 +136,5 @@ output_path = 'Transformed_Project_Timeline_Update.xlsx'
 
 
 transformed_data = main(file_path, output_path)
-print(transformed_data)
+print(transformed_data['Late'])
+print(type(transformed_data['Late']))
