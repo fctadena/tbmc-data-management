@@ -7,12 +7,12 @@ from bs4 import BeautifulSoup
 import requests
 import re
 
-
 #2. DEVELOP THE APP
 #2.1 create necessary variables, flags & dataframe for scrapped data "scrapped_data_df"
 file_path = "TBMC_ITEMS_TO_MONITOR.xlsx"
 # columns = ['description', 'type', 'url', 'price', 'date_stamp']
 # scrapped_data_df = pd.DataFrame(columns=columns)
+
 
 
 #2.2 xlsx to dict - initialize the process by storing the required items (products to monitor) in dictionary called "products"
@@ -49,7 +49,6 @@ def read_excel_file(file_path):
     return products
 
 
-
 # #2.3 main_processor - loop through the dict, perform scrapping, and add records to scrapped_data_df
 def core_func(products):
     # columns = ["description", "type", "url", "price", "time_stamp", "status"]
@@ -62,10 +61,14 @@ def core_func(products):
         #Generate "price", "time_stamp" and "status" here.!!!
         time_stamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         
-        price_source = requests.get(i['url'])
-        soup_price_source = BeautifulSoup(price_source.text, 'html')
-        price = float(re.sub(r'[^\d.]+', '', soup_price_source.find('span', attrs={'class':i['classs']}).text.strip()))
-
+        try:
+            price_source = requests.get(i['url'])
+            soup_price_source = BeautifulSoup(price_source.text, 'html')
+            price = float(re.sub(r'[^\d.]+', '', soup_price_source.find('span', attrs={'class':i['classs']}).text.strip()))
+        except:
+            price = 0
+            return price
+        
         new_row = [
             i['description'],
             i['type'],
@@ -81,7 +84,6 @@ def core_func(products):
         
     print(scrapped_data_df.dtypes)
     return scrapped_data_df
-
 
 
 
@@ -129,7 +131,6 @@ def update_price_recordings(scrapped_data_df):
             return False
     
     return True
-
 
 
 #2.5 create main function 
