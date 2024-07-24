@@ -49,6 +49,7 @@ def read_excel_file(file_path):
     return products
 
 
+
 # #2.3 main_processor - loop through the dict, perform scrapping, and add records to scrapped_data_df
 def core_func(products):
     # columns = ["description", "type", "url", "price", "time_stamp", "status"]
@@ -66,8 +67,9 @@ def core_func(products):
             soup_price_source = BeautifulSoup(price_source.text, 'html')
             price = float(re.sub(r'[^\d.]+', '', soup_price_source.find('span', attrs={'class':i['classs']}).text.strip()))
         except:
+            print("Exept on try")
             price = 0
-            return price
+            
         
         new_row = [
             i['description'],
@@ -78,6 +80,7 @@ def core_func(products):
             time_stamp
         ]
         
+        print("test")
         print(new_row)
 
         scrapped_data_df.loc[len(scrapped_data_df)] = new_row
