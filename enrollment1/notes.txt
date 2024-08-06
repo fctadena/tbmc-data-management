@@ -1,3 +1,7 @@
 SCHEDULER IN ASANA?
 https://learn.microsoft.com/en-us/dynamics365/business-central/dev-itpro/developer/devenv-task-scheduler
 
+
+
+STORIES - TO SEE THE OBJECTS STORIES
+https://developers.asana.com/reference/getstory
