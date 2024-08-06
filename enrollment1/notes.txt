@@ -1,0 +1,3 @@
+SCHEDULER IN ASANA?
+https://learn.microsoft.com/en-us/dynamics365/business-central/dev-itpro/developer/devenv-task-scheduler
+
