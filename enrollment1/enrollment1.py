@@ -7,11 +7,11 @@ import requests
 from helpers import get_gid_from_json
 
 
+
 gid_file_path = 'workspace.json'
 
 load_dotenv()
 access_token = os.getenv('ASANA_TOKEN')
-# workspace_gid = os.getenv('GID')
 workspace_gid = get_gid_from_json(gid_file_path)
 print(workspace_gid)
 
@@ -19,7 +19,7 @@ print(workspace_gid)
 
 
 
-# configuration = asana.Configuration()
+# configuration = asana.Configuratio
 # configuration.access_token = access_token
 # api_client = asana.ApiClient(configuration)
 
