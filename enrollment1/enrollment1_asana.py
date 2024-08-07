@@ -13,11 +13,22 @@ configuration = asana.Configuration()
 configuration.access_token = access_token
 api_client = asana.ApiClient(configuration)
 
-#PART 1: GETTING RAW DATA
-#1. GET WORKSPACE
-#2. GET PROJECT
-#3. 
+#APP 1: BASIC OVERVIEW
 
+#PART 1: GETTING RAW DATA
+#1.1 SET AUTHRORIZATION
+#1.2 GET REQUIRED PARAMS (WORKSPACE, PROJECT, ETC)
+#1.3 SETUP FUNCTION TO CALL THE API FOR ALL TASK IN THE PROJECT AND RETURN A DATAFRAME FOR FURTHER PROCESSING.
+
+#PART 2: TRANSFORMING THE RAW DATA
+#2.1 SET
+#2.2
+#2.3 
+
+
+
+
+#APP 2: 
 
 
 # create an instance of the API class
