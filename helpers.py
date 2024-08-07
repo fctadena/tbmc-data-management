@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import json
 
 def list_files_in_folder(folder_name):
     """
@@ -66,3 +67,17 @@ def transform_dataframe(df):
 df = pd.DataFrame({'task': ['Task 1'], 'assigned_to': ['Assignee1;Assignee2']})
 transformed_df = transform_dataframe(df)
 print(transformed_df)
+
+
+
+
+
+
+def get_gid_from_json(file_path):
+    # Open and read the JSON file
+    with open(file_path, 'r') as file:
+        data = json.load(file)
+    
+    # Extract the value of gid
+    gid = data['data'][0]['gid']
+    return gid
