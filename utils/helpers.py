@@ -81,3 +81,9 @@ def get_gid_from_json(file_path):
     # Extract the value of gid
     gid = data['data'][0]['gid']
     return gid
+
+
+def simple_print(word):
+    word = word
+
+    print(word)
