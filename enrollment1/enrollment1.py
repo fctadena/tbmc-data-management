@@ -4,16 +4,33 @@ from pprint import pprint
 from dotenv import load_dotenv
 import os
 import requests
-from helpers import get_gid_from_json
+# from helpers import get_gid_from_json
 import pandas as pd
 from datetime import datetime
+import json
 
 
-gid_file_path = 'workspace.json'
+# def get_gid_from_json(file_path):
+#     # Open and read the JSON file
+#     with open(file_path, 'r') as file:
+#         data = json.load(file)
+    
+#     # Extract the value of gid
+#     gid = data['data'][0]['gid']
+#     return gid
+
+
+def get_gid_from_json():
+    gid = "1207998439135084"
+    return gid
+
+
+
+# gid_file_path = 'workspace.json'
 
 load_dotenv()
 access_token = os.getenv('ASANA_TOKEN')
-workspace_gid = get_gid_from_json(gid_file_path)
+workspace_gid = get_gid_from_json()
 
 
 
@@ -128,14 +145,27 @@ def rename_column_names(df):
 df = rename_column_names(df)
 
 
-# Function to extract the name from the email or handle None/empty cases
+# # Function to extract the name from the email or handle None/empty cases
+# def extract_name(assignee_dict):
+#     if assignee_dict is None:
+#         return "<unassigned>"
+    
+#     else:
+#         email = assignee_dict['name']
+#         first_name, last_name = email.split('@')[0].split('.')
+#         return f"{first_name.capitalize()} {last_name.capitalize()}"
+
 def extract_name(assignee_dict):
     if assignee_dict is None:
-        return "<unassigned>"
+        return ""
     else:
-        email = assignee_dict['name']
-        first_name, last_name = email.split('@')[0].split('.')
-        return f"{first_name.capitalize()} {last_name.capitalize()}"
+        email = assignee_dict.get('name')
+        if email is None:
+            return ""
+        else:
+            first_name, last_name = email.split('@')[0].split('.')
+            return f"{first_name.capitalize()} {last_name.capitalize()}"
+        
 
 # Apply the function to the 'assignee' column
 df['PIC'] = df['PIC'].apply(lambda x: extract_name(x) if x else "<unassigned>")
@@ -172,6 +202,9 @@ def extract_names(tag_list):
     return [tag['name'] for tag in tag_list]  # Extract the 'name' values
 
 df['tags'] = df['tags'].apply(lambda x: extract_names(x))
+
+
+
 
 
 def determine_project_type(tags):
