@@ -9,7 +9,6 @@ import pandas as pd
 from datetime import datetime
 
 
-
 gid_file_path = 'workspace.json'
 
 load_dotenv()
@@ -112,6 +111,8 @@ def get_all_task(project_gid, opts_tasks):
         
 df = get_all_task(project_gid, opts_tasks)
 
+
+
 def rename_column_names(df):
     column_mapping = {
         'created_at': 'INIT DATE',
@@ -205,6 +206,7 @@ def determine_doc_type(tags):
 
 df['DOC_TYPE'] = df['tags'].apply(lambda x: determine_doc_type(x))
 
+
 project_list = [
     "AUTOCOMPACTOR",
     "HYDRAULIC PROJECT",
@@ -218,8 +220,10 @@ project_list = [
     "PEC 2020: PE Panel Cooling",
     "PEC 2020: Process adaptation",
     "FFE-RARE",
-    "PEC 2020: Spot Cooling"
+    "PEC 2020: Spot Cooling",
+    "<X> VACUUM PUMP"
 ]
+
 
 def find_project(tags):
     for project in project_list:
@@ -242,4 +246,73 @@ def task_stories(row):
 
 df['REMARKS'] = df.apply(lambda row: task_stories(row), axis=1)
 
+
+
+# Define the get_latest_created_at function
+def get_latest_created_at(task_gid, stories_api_instance, opts):
+    try:
+        # Get stories from a task
+        api_response = stories_api_instance.get_stories_for_task(task_gid, opts)
+
+        assigned_time = None
+        section_changed_time = None
+        added_to_project_time = None
+
+        for data in api_response:
+            resource_subtype = data.get('resource_subtype')
+            created_at = data.get('created_at')
+
+            if created_at:
+                created_at_date = datetime.strptime(created_at, '%Y-%m-%dT%H:%M:%S.%fZ').date()
+
+            if resource_subtype == 'assigned':
+                assigned_time = created_at_date
+            elif resource_subtype == 'section_changed':
+                section_changed_time = created_at_date
+            elif resource_subtype == 'added_to_project':
+                added_to_project_time = created_at_date
+
+        if assigned_time:
+            return assigned_time.strftime('%Y-%m-%d')
+        elif section_changed_time:
+            return section_changed_time.strftime('%Y-%m-%d')
+        elif added_to_project_time:
+            return added_to_project_time.strftime('%Y-%m-%d')
+        else:
+            return None
+
+    except asana.ApiException as e:
+        print("Exception when calling StoriesApi->get_stories_for_task: %s\n" % e)
+        return None
+
+# Set up Asana API client and StoriesApi instance
+stories_api_instance = asana.StoriesApi(api_client)
+opts = {
+    'opt_fields': "created_at,resource_subtype"
+}
+
+# Use lambda function to create the new 'TIMESTAMP' column in the DataFrame
+df['TIMESTAMP'] = df['gid'].apply(lambda x: get_latest_created_at(x, stories_api_instance, opts))
+
+
+
+
+# Function to calculate the age in days
+def calculate_age_in_days(timestamp):
+    if pd.isna(timestamp):
+        return None
+    # Convert string to datetime object
+    timestamp_date = datetime.strptime(timestamp, '%Y-%m-%d').date()
+    return (datetime.now().date() - timestamp_date).days
+
+# Applying the function to create a new column 'AGE (DAYS)'
+df['AGE (DAYS)'] = df['TIMESTAMP'].apply(lambda x: calculate_age_in_days(x))
+
+
+
 print(df)
+
+
+
+
+
