@@ -13,8 +13,8 @@ gid_file_path = 'workspace.json'
 
 load_dotenv()
 access_token = os.getenv('ASANA_TOKEN')
-workspace_gid = get_gid_from_json(gid_file_path)
-
+# workspace_gid = get_gid_from_json(gid_file_path)
+workspace_gid = "1207998439135084"
 
 
 
