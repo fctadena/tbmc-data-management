@@ -13,8 +13,12 @@ gid_file_path = 'workspace.json'
 
 load_dotenv()
 access_token = os.getenv('ASANA_TOKEN')
+<<<<<<< HEAD
 # workspace_gid = get_gid_from_json(gid_file_path)
 workspace_gid = "1207998439135084"
+=======
+
+>>>>>>> 0d67cc1bb341c7ec256e2c5f6caf1d591d82c93b
 
 
 
@@ -310,8 +314,23 @@ df['AGE (DAYS)'] = df['TIMESTAMP'].apply(lambda x: calculate_age_in_days(x))
 
 
 
-print(df)
 
+
+
+#SAVING DATAFRAME TO EXCEL
+def save_to_excel(df: pd.DataFrame, filename: str = "PROCESSED_DATA.xlsx"):
+    """
+    Save the given DataFrame to an Excel file. Overwrite the file if it already exists.
+
+    Parameters:
+    df (pd.DataFrame): The DataFrame to save.
+    filename (str): The name of the Excel file to save. Default is "PROCESSED_DATA.xlsx".
+    """
+    # Save the DataFrame to an Excel file, overriding if it exists
+    df.to_excel(filename, index=False)
+
+# Example usage
+save_to_excel(df)
 
 
 
