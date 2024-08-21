@@ -337,16 +337,16 @@ df['TIMESTAMP'] = pd.to_datetime(df['TIMESTAMP'], errors='coerce')
 
 
 
-# # Function to calculate the age in days
-# def calculate_age_in_days(timestamp):
-#     if pd.isna(timestamp):
-#         return None
-#     # Convert string to datetime object
-#     timestamp_date = datetime.strptime(timestamp, '%Y-%m-%d').date()
-#     return (datetime.now().date() - timestamp_date).days
+# Function to calculate the age in days
+def calculate_age_in_days(timestamp):
+    if pd.isna(timestamp):
+        return None
+    # Directly use the date() method if timestamp is a Timestamp object
+    timestamp_date = timestamp.date() if isinstance(timestamp, pd.Timestamp) else datetime.strptime(timestamp, '%Y-%m-%d').date()
+    return (datetime.now().date() - timestamp_date).days
 
-# # Applying the function to create a new column 'AGE (DAYS)'
-# df['AGE (DAYS)'] = df['TIMESTAMP'].apply(lambda x: calculate_age_in_days(x))
+# Applying the function to create a new column 'AGE (DAYS)'
+df['AGE (DAYS)'] = df['TIMESTAMP'].apply(calculate_age_in_days)
 
 
 
