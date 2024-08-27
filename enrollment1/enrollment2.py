@@ -362,9 +362,49 @@ df['gid'] = pd.to_numeric(df['gid'], errors='coerce').astype('Int64')  # Use 'In
 df = df.drop(columns=['tags'])
 
 
+#POPULATING REMARKS COLUMN
+def get_remarks_for_task(task_gid):
+    configuration = asana.Configuration()
+    configuration.access_token = os.getenv('ASANA_TOKEN')
+    api_client = asana.ApiClient(configuration)
+
+    stories_api_instance = asana.StoriesApi(api_client)
+    opts = {
+        'opt_fields': "created_at,resource_subtype,text,created_by.name"
+    }
+
+    relevant_subtypes = {"added_to_project", "section_changed", "assigned", "unassigned", "comment_added"}
+    remarks = []
+
+    try:
+        # Get stories from a task
+        api_response = stories_api_instance.get_stories_for_task(task_gid, opts)
+        
+        for story in api_response:
+            if story.get('resource_subtype') in relevant_subtypes:
+                # Extract and format the required information
+                created_at = story.get('created_at')[:10]  # Extract date only (YYYY-MM-DD)
+                resource_subtype = story.get('resource_subtype')
+                text = story.get('text')
+                formatted_remark = f"[{created_at}] {resource_subtype}: \"{text}\""
+                remarks.append(formatted_remark)
+                
+        
+        # Check if no relevant stories were found
+        if not remarks:
+            remarks.append("<No Relevant Activity>")
+
+    except ApiException as e:
+        print("Exception when calling StoriesApi->get_stories_for_task: %s\n" % e)
+        remarks.append("<No Relevant Activity>")
+
+    return "\n".join(remarks)
+
+# Example usage with lambda to populate the REMARKS column in the DataFrame
+df['REMARKS'] = df['gid'].apply(lambda gid: get_remarks_for_task(gid))
 
 
-
+#SAVING TO DATABASE
 db_params = {
     'host': os.getenv('DB_HOST') or 'localhost',
     'database': os.getenv('DB_NAME') or 'tbmc_db',
